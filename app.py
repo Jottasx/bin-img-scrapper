@@ -1,9 +1,18 @@
+import os
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+# Carrega as variáveis de ambiente
+load_dotenv()
+
+# ENV variables
+email = os.getenv('EMAIL')
+password = os.getenv('PASSWORD')
 
 # Função para iniciar o driver do Selenium com as opções configuradas
 def start_selenium_driver():
@@ -32,8 +41,8 @@ def login(driver, email, password):
 # Função principal para executar o script
 def main():
     # Solicita que o usuário insira o email e a senha
-    email = input("Please enter your email: ")
-    password = input("Please enter your password: ")
+    #email = input("Please enter your email: ")
+    #password = input("Please enter your password: ")
     # Inicia o Selenium e realiza o login
     driver = start_selenium_driver()
     login(driver, email, password)
