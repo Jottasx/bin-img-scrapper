@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -10,9 +11,21 @@ from selenium.webdriver.support import expected_conditions as EC
 # Carrega as variáveis de ambiente
 load_dotenv()
 
-# ENV variables
+# Variáveis ENV
 email = os.getenv('EMAIL')
 password = os.getenv('PASSWORD')
+smg13path = os.getenv('SMG13PATH')
+
+# Variáveis globais
+smgoi13 = None
+
+# Lê a planilha smgoi13 e cria um dataframe 
+def read_smgoi13(path):
+    global smgoi13
+    if smgoi13 == None:
+        smgoi13 = pd.read_excel(path)
+        # Formata a coluna de códigos para o formato (5 digitos)
+        smgoi13['Código'] = smgoi13['Código'].str.split('-').str.get(0)
 
 # Função para iniciar o driver do Selenium com as opções configuradas
 def start_selenium_driver():
@@ -38,12 +51,8 @@ def login(driver, email, password):
     # Aguarda o botão de submit estar presente e clica nele
     wait_for_element(driver, By.XPATH, '//button[@type="submit"]').click()
 
-# Função principal para executar o script
 def main():
-    # Solicita que o usuário insira o email e a senha
-    #email = input("Please enter your email: ")
-    #password = input("Please enter your password: ")
-    # Inicia o Selenium e realiza o login
+    read_smgoi13(smg13path)
     driver = start_selenium_driver()
     login(driver, email, password)
 
