@@ -76,8 +76,8 @@ def download_image(driver, product_code):
 # Função para atualizar as imagens que já foram baixadas na pasta
 def update_downloaded_images():
     for image in get_folder_images():
-        image_name = image.split(" ")[-1][:-4]
-        downloaded_images.append(image_name)
+        image_code = image.split(" ")[-1][:-4]
+        downloaded_images.append(image_code)
 
 def get_folder_images():
     return os.listdir(image_folder_path)
