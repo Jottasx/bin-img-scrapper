@@ -33,6 +33,13 @@ def start_selenium_driver():
     chrome_options = Options()
     chrome_options.add_argument("--window-size=1920,1080")  
     chrome_options.add_argument("--start-maximized")
+    chrome_prefs = {
+        "download.default_directory": "D:\\ATACAS\\",  
+        "download.prompt_for_download": False,       
+        "safebrowsing.enabled": True,
+        "safebrowsing.disable_download_protection": True                 
+    }
+    chrome_options.add_experimental_option("prefs", chrome_prefs)
     service = Service('C:\\Program Files\\Google\\chromedriver-win64\\chromedriver.exe')  
     return webdriver.Chrome(service=service, options=chrome_options)
 
