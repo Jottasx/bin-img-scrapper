@@ -58,15 +58,15 @@ def download_image(driver, product_code):
     WebDriverWait(driver, 10).until (
         EC.visibility_of_element_located((By.ID, "modal-download-image"))
     ).find_element(By.TAG_NAME, 'a').click()
-    time.sleep(5)
-         
 
 def main():
     read_smgoi13(smg13path)
     driver = start_selenium_driver()
     login(driver, email, password)
-    download_image(driver, smgoi13['Código'][0])
-    
+
+    for code in smgoi13['Código']:
+        download_image(driver, code)
+        print(f"[OK] A imagem do produto {code} foi baixada com sucesso")
 
 if __name__ == "__main__":
     main()
