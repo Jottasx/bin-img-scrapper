@@ -70,13 +70,17 @@ def download_image(driver, product_code):
     WebDriverWait(driver, 10).until (
         EC.visibility_of_element_located((By.ID, "modal-download-image"))
     ).find_element(By.TAG_NAME, 'a').click()
+
     print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
 
+# Função para atualizar as imagens que já foram baixadas na pasta
 def update_downloaded_images():
-    folder_images = os.listdir(image_folder_path)
-    for image in folder_images:
+    for image in get_folder_images():
         image_name = image.split(" ")[-1][:-4]
         downloaded_images.append(image_name)
+
+def get_folder_images():
+    return os.listdir(image_folder_path)
 
 def main():
     read_smgoi13(smg13path)
