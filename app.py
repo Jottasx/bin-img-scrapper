@@ -18,7 +18,9 @@ password = os.getenv('PASSWORD')
 smg13path = os.getenv('SMG13PATH')
 
 # Variáveis globais
+image_folder_path = "D:\\ATACAS\\"
 smgoi13 = None
+downloaded_images = []
 
 # Lê a planilha smgoi13 e cria um dataframe 
 def read_smgoi13(path):
@@ -58,6 +60,9 @@ def login(driver, email, password):
 
 # Função para baixar as imagens do site
 def download_image(driver, product_code):
+    if product_code in downloaded_images:
+        print(f"[X] A imagem do produto {product_code} já existe na pasta")
+        return
     driver.get(f"https://sistemabin.com.br/produtos?q={product_code}&qs=")
     wait_for_element(driver, By.XPATH, f"//a[contains(@href, '{product_code}')]").click()
     wait_for_element(driver, By.XPATH, '//div[@class="col-12 col-md-6"]').find_elements(By.XPATH, './/button')[0].click()
@@ -65,15 +70,22 @@ def download_image(driver, product_code):
     WebDriverWait(driver, 10).until (
         EC.visibility_of_element_located((By.ID, "modal-download-image"))
     ).find_element(By.TAG_NAME, 'a').click()
+    print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
+
+def update_downloaded_images():
+    folder_images = os.listdir(image_folder_path)
+    for image in folder_images:
+        image_name = image.split(" ")[-1][:-4]
+        downloaded_images.append(image_name)
 
 def main():
     read_smgoi13(smg13path)
+    update_downloaded_images()
     driver = start_selenium_driver()
     login(driver, email, password)
 
-    for code in smgoi13['Código']:
-        download_image(driver, code)
-        print(f"[OK] A imagem do produto {code} foi baixada com sucesso")
+    for product_code in smgoi13['Código']:
+        download_image(driver, product_code)
 
 if __name__ == "__main__":
     main()
