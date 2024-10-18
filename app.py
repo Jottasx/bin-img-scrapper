@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 # Carrega as variáveis de ambiente
 load_dotenv()
@@ -43,18 +44,29 @@ def wait_for_element(driver, by, element):
 
 # Função para realizar o login
 def login(driver, email, password):
-    driver.get('https://sistemabin.com.br/login')  # Abre a página de login
-    # Aguarda o campo de email estar presente e preenche com o valor fornecido
+    driver.get('https://sistemabin.com.br/login')
     wait_for_element(driver, By.ID, 'email').send_keys(email)
-    # Aguarda o campo de senha estar presente e preenche com o valor fornecido
     wait_for_element(driver, By.ID, 'password').send_keys(password)
-    # Aguarda o botão de submit estar presente e clica nele
     wait_for_element(driver, By.XPATH, '//button[@type="submit"]').click()
+
+# Função para baixar as imagens do site
+def download_image(driver, product_code):
+    driver.get(f"https://sistemabin.com.br/produtos?q={product_code}&qs=")
+    wait_for_element(driver, By.XPATH, f"//a[contains(@href, '{product_code}')]").click()
+    wait_for_element(driver, By.XPATH, '//div[@class="col-12 col-md-6"]').find_elements(By.XPATH, './/button')[0].click()
+    # Espera o modal ficar visível
+    WebDriverWait(driver, 10).until (
+        EC.visibility_of_element_located((By.ID, "modal-download-image"))
+    ).find_element(By.TAG_NAME, 'a').click()
+    time.sleep(5)
+         
 
 def main():
     read_smgoi13(smg13path)
     driver = start_selenium_driver()
     login(driver, email, password)
+    download_image(driver, smgoi13['Código'][0])
+    
 
 if __name__ == "__main__":
     main()
