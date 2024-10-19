@@ -73,6 +73,9 @@ def get_image_name_by(product_code):
         if image_file.split(" ")[-1][:-4] == str(product_code):
             return image_file
 
+def get_product_code_by(image_name):
+    return image_name.split(" ")[-1][:-4]
+
 # Função para baixar as imagens do site
 def download_image(driver, product_code):
     if product_code in downloaded_images:
@@ -100,8 +103,7 @@ def main():
 
     for product_code in smgoi13['Código']:
         download_image(driver, product_code)
-        time.sleep(2) # Necessário aguardar a imagem ser baixada
-        rename_image_file(str(product_code))
+        
 
 if __name__ == "__main__":
     main()
