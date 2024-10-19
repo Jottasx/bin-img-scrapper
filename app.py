@@ -58,20 +58,7 @@ def login(driver, email, password):
     wait_for_element(driver, By.ID, 'password').send_keys(password)
     wait_for_element(driver, By.XPATH, '//button[@type="submit"]').click()
 
-# Função para baixar as imagens do site
-def download_image(driver, product_code):
-    if product_code in downloaded_images:
-        print(f"[X] A imagem do produto {product_code} já existe na pasta")
-        return
-    driver.get(f"https://sistemabin.com.br/produtos?q={product_code}&qs=")
-    wait_for_element(driver, By.XPATH, f"//a[contains(@href, '{product_code}')]").click()
-    wait_for_element(driver, By.XPATH, '//div[@class="col-12 col-md-6"]').find_elements(By.XPATH, './/button')[0].click()
-    # Espera o modal ficar visível
-    WebDriverWait(driver, 10).until (
-        EC.visibility_of_element_located((By.ID, "modal-download-image"))
-    ).find_element(By.TAG_NAME, 'a').click()
 
-    print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
 
 # Função para atualizar as imagens que já foram baixadas na pasta
 def update_downloaded_images():
@@ -82,6 +69,27 @@ def update_downloaded_images():
 def get_folder_images():
     return os.listdir(image_folder_path)
 
+def get_image_name_by(product_code):
+    for image_file in get_folder_images():
+        print(f"img_file={image_file.split(" ")[-1][:-4]} product_code={product_code}")
+
+
+# Função para baixar as imagens do site
+def download_image(driver, product_code):
+    if product_code in downloaded_images:
+        print(f"[X] A imagem do produto {product_code} já existe na pasta")
+        return
+    
+    driver.get(f"https://sistemabin.com.br/produtos?q={product_code}&qs=")
+    wait_for_element(driver, By.XPATH, f"//a[contains(@href, '{product_code}')]").click()
+    wait_for_element(driver, By.XPATH, '//div[@class="col-12 col-md-6"]').find_elements(By.XPATH, './/button')[0].click()
+    # Espera o modal ficar visível
+    WebDriverWait(driver, 10).until (
+        EC.visibility_of_element_located((By.ID, "modal-download-image"))
+    ).find_element(By.TAG_NAME, 'a').click()
+    get_image_name_by(product_code)
+    print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
+        
 def main():
     read_smgoi13(smg13path)
     update_downloaded_images()
