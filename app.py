@@ -58,8 +58,6 @@ def login(driver, email, password):
     wait_for_element(driver, By.ID, 'password').send_keys(password)
     wait_for_element(driver, By.XPATH, '//button[@type="submit"]').click()
 
-
-
 # Função para atualizar as imagens que já foram baixadas na pasta
 def update_downloaded_images():
     for image in get_folder_images():
@@ -71,8 +69,8 @@ def get_folder_images():
 
 def get_image_name_by(product_code):
     for image_file in get_folder_images():
-        print(f"img_file={image_file.split(" ")[-1][:-4]} product_code={product_code}")
-
+        if image_file.split(" ")[-1][:-4] == str(product_code):
+            return image_file
 
 # Função para baixar as imagens do site
 def download_image(driver, product_code):
@@ -87,8 +85,11 @@ def download_image(driver, product_code):
     WebDriverWait(driver, 10).until (
         EC.visibility_of_element_located((By.ID, "modal-download-image"))
     ).find_element(By.TAG_NAME, 'a').click()
-    get_image_name_by(product_code)
     print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
+
+def rename_image_file(product_code):
+    os.rename(f"{image_folder_path}{get_image_name_by(product_code)}", f"{image_folder_path}{product_code}.jpg")
+
         
 def main():
     read_smgoi13(smg13path)
@@ -98,6 +99,8 @@ def main():
 
     for product_code in smgoi13['Código']:
         download_image(driver, product_code)
+        time.sleep(2) # Necessário aguardar a imagem ser baixada
+        rename_image_file(str(product_code))
 
 if __name__ == "__main__":
     main()
