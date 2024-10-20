@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import time
 
 # Carrega as variáveis de ambiente
@@ -81,15 +82,18 @@ def download_image(driver, product_code):
     if product_code in downloaded_images:
         print(f"[X] A imagem do produto {product_code} já existe na pasta")
         return
-    
-    driver.get(f"https://sistemabin.com.br/produtos?q={product_code}&qs=")
-    wait_for_element(driver, By.XPATH, f"//a[contains(@href, '{product_code}')]").click()
-    wait_for_element(driver, By.XPATH, '//div[@class="col-12 col-md-6"]').find_elements(By.XPATH, './/button')[0].click()
-    # Espera o modal ficar visível
-    WebDriverWait(driver, 10).until (
-        EC.visibility_of_element_located((By.ID, "modal-download-image"))
-    ).find_element(By.TAG_NAME, 'a').click()
-    print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
+
+    try:
+        driver.get(f"https://sistemabin.com.br/produtos?q={product_code}&qs=")
+        wait_for_element(driver, By.XPATH, f"//a[contains(@href, '{product_code}')]").click()
+        wait_for_element(driver, By.XPATH, '//div[@class="col-12 col-md-6"]').find_elements(By.XPATH, './/button')[0].click()
+        # Espera o modal ficar visível
+        WebDriverWait(driver, 15).until (
+            EC.visibility_of_element_located((By.ID, "modal-download-image"))
+        ).find_element(By.TAG_NAME, 'a').click()
+        print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
+    except TimeoutException:
+        print(f"[x] Erro ao baixar imagem do produto {product_code} pulando para o próximo")
 
 def rename_image_file(product_code):
     os.rename(f"{image_folder_path}{get_image_name_by(product_code)}", f"{image_folder_path}{product_code}.jpg")
@@ -103,6 +107,9 @@ def main():
 
     for product_code in smgoi13['Código']:
         download_image(driver, product_code)
+
+    # for image_file in get_folder_images():
+    #     rename_image_file(get_product_code_by(image_file))
         
 
 if __name__ == "__main__":
