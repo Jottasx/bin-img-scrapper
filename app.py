@@ -65,6 +65,7 @@ def update_downloaded_images():
     for image in get_folder_images():
         image_code = image.split(" ")[-1][:-4]
         downloaded_images.append(image_code)
+        print(f"A imagem do produto {image_code} já existe na pasta")
 
 def get_folder_images():
     return os.listdir(image_folder_path)
@@ -79,10 +80,6 @@ def get_product_code_by(image_name):
 
 # Função para baixar as imagens do site
 def download_image(driver, product_code):
-    if product_code in downloaded_images:
-        print(f"[X] A imagem do produto {product_code} já existe na pasta")
-        return
-
     try:
         driver.get(f"https://sistemabin.com.br/produtos?q={product_code}&qs=")
         wait_for_element(driver, By.XPATH, f"//a[contains(@href, '{product_code}')]").click()
@@ -93,7 +90,7 @@ def download_image(driver, product_code):
         ).find_element(By.TAG_NAME, 'a').click()
         print(f"[OK] A imagem do produto {product_code} foi baixada com sucesso")
     except TimeoutException:
-        print(f"[x] Erro ao baixar imagem do produto {product_code} pulando para o próximo")
+        print(f"[x] Erro ao baixar imagem do produto {product_code} pulando para a próxima imagem")
 
 def rename_image_file(product_code):
     os.rename(f"{image_folder_path}{get_image_name_by(product_code)}", f"{image_folder_path}{product_code}.jpg")
@@ -105,7 +102,8 @@ def main():
     driver = start_selenium_driver()
     login(driver, email, password)
 
-    for product_code in smgoi13['Código']:
+    filtered_codes = smgoi13[~smgoi13['Código'].isin(downloaded_images)]
+    for product_code in filtered_codes['Código']:
         download_image(driver, product_code)
 
     # for image_file in get_folder_images():
