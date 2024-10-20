@@ -49,7 +49,7 @@ def start_selenium_driver():
 
 # Função para esperar que um elemento esteja disponível no DOM
 def wait_for_element(driver, by, element):
-    return WebDriverWait(driver, 10).until(
+    return WebDriverWait(driver, 4).until(
         EC.presence_of_element_located((by, element))
     )
 
